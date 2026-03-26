@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Omniscient Reader's Viewpoint — The Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-inner">
+    <div class="loading-logo">
+      <div class="loading-title">OMNISCIENT READER'S VIEWPOINT</div>
+      <div class="loading-subtitle">三 가지 방법으로 살아남기</div>
+    </div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-bg">
+        <div id="loading-fill" class="loading-bar-fill"></div>
+      </div>
+      <div id="loading-text" class="loading-text">Initializing...</div>
+    </div>
+    <div class="loading-quote">"The story that only I have read to the end."</div>
+  </div>
+</div>
+
+<!-- MAIN MENU -->
+<div id="main-menu" class="hidden">
+  <canvas id="menu-canvas"></canvas>
+  <div class="menu-overlay">
+    <div class="menu-title-block">
+      <div class="menu-eyebrow">BASED ON THE NOVEL BY SING-SHONG</div>
+      <div class="menu-title">OMNISCIENT READER'S</div>
+      <div class="menu-title-accent">VIEWPOINT</div>
+      <div class="menu-title-sub">A Story Only I Could Read</div>
+    </div>
+    <nav class="menu-nav">
+      <button id="btn-new-game" class="menu-btn menu-btn-primary">▶ New Game</button>
+      <button id="btn-continue" class="menu-btn hidden">↩ Continue</button>
+      <button id="btn-load-game" class="menu-btn">◈ Load Game</button>
+      <button id="btn-settings" class="menu-btn">⚙ Settings</button>
+    </nav>
+    <div class="menu-footer">
+      <span>WASD / Arrows: Move</span>
+      <span>Space / Click: Attack</span>
+      <span>F: Interact</span>
+      <span>Q W E: Skills</span>
+      <span>ESC: Pause</span>
+    </div>
+  </div>
+</div>
+
+<!-- GAME CANVAS -->
+<canvas id="game-canvas" class="hidden"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+
+  <!-- Player stats top-left -->
+  <div id="hud-player">
+    <div id="hud-portrait-wrap">
+      <div id="hud-portrait-icon">KD</div>
+      <div id="hud-level">Lv.1</div>
+    </div>
+    <div id="hud-bars">
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">HP</span>
+        <div class="hud-bar hud-bar-hp"><div id="hud-hp-fill" class="hud-bar-fill" style="width:100%"></div></div>
+        <span id="hud-hp-text" class="hud-bar-num">100/100</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">MP</span>
+        <div class="hud-bar hud-bar-mp"><div id="hud-mp-fill" class="hud-bar-fill" style="width:100%"></div></div>
+        <span id="hud-mp-text" class="hud-bar-num">50/50</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">SP</span>
+        <div class="hud-bar hud-bar-sp"><div id="hud-sp-fill" class="hud-bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">EXP</span>
+        <div class="hud-bar hud-bar-exp"><div id="hud-exp-fill" class="hud-bar-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top-right: gold + minimap -->
+  <div id="hud-topright">
+    <div id="hud-gold-wrap">💰 <span id="hud-gold">0</span></div>
+    <canvas id="minimap-canvas" width="150" height="110"></canvas>
+  </div>
+
+  <!-- Scenario timer top-center -->
+  <div id="scenario-timer" style="display:none"></div>
+
+  <!-- Bottom-center skill bar -->
+  <div id="hud-skillbar">
+    <div class="skill-slot" id="skill-slot-1"><div class="skill-icon">—</div><div class="skill-cd" style="display:none"></div><div class="skill-key">Q</div></div>
+    <div class="skill-slot" id="skill-slot-2"><div class="skill-icon">—</div><div class="skill-cd" style="display:none"></div><div class="skill-key">W</div></div>
+    <div class="skill-slot" id="skill-slot-3"><div class="skill-icon">—</div><div class="skill-cd" style="display:none"></div><div class="skill-key">E</div></div>
+    <div class="skill-slot" id="skill-slot-4"><div class="skill-icon">—</div><div class="skill-cd" style="display:none"></div><div class="skill-key">R</div></div>
+    <div class="skill-slot" id="skill-slot-5"><div class="skill-icon">—</div><div class="skill-cd" style="display:none"></div><div class="skill-key">T</div></div>
+  </div>
+
+  <!-- Bottom-right HUD buttons -->
+  <div id="hud-buttons">
+    <button id="hud-inventory" class="hud-btn" title="Inventory (I)">🎒</button>
+    <button id="hud-quest" class="hud-btn" title="Quests (J)">📜</button>
+    <button id="hud-map" class="hud-btn" title="Map (M)">🗺</button>
+    <button id="hud-menu" class="hud-btn" title="Menu (ESC)">☰</button>
+  </div>
+
+  <!-- Boss HP bar -->
+  <div id="boss-hp-bar" style="display:none">
+    <div class="boss-info-row">
+      <span id="boss-name">Boss</span>
+      <span id="boss-phase"></span>
+    </div>
+    <div class="boss-bar-bg"><div id="boss-hp-fill" class="boss-bar-fill"></div></div>
+    <div id="boss-hp-text" class="boss-hp-text"></div>
+  </div>
+
+  <!-- Interact prompt -->
+  <div id="interact-prompt" style="display:none">[F] Interact</div>
+
+</div><!-- end #hud -->
+
+<!-- SYSTEM MESSAGE (ORV novel-style pop-up) -->
+<div id="system-message-overlay" style="display:none">
+  <div id="system-message-text"></div>
+  <hr class="system-message-divider">
+  <div id="system-message-subtext"></div>
+</div>
+
+<!-- SCENARIO START FLASH -->
+<div id="scenario-start">
+  <div class="scenario-start-inner">
+    <div class="scenario-grade"></div>
+    <div class="scenario-title"></div>
+    <div class="scenario-desc"></div>
+  </div>
+</div>
+
+<!-- DIALOGUE -->
+<div id="dialogue-panel">
+  <div id="dialogue-portrait-wrap">
+    <canvas id="dialogue-portrait-canvas" width="100" height="100"></canvas>
+  </div>
+  <div id="dialogue-content">
+    <div id="dialogue-name">—</div>
+    <div id="dialogue-text"></div>
+    <div id="dialogue-choices"></div>
+    <div id="dialogue-continue">▼ Continue</div>
+  </div>
+</div>
+
+<!-- INVENTORY PANEL -->
+<div id="inventory-panel" class="panel">
+  <div class="panel-header"><span>📦 Inventory</span><button class="panel-close">✕</button></div>
+  <div class="inventory-tabs">
+    <button class="inventory-tab active" data-tab="all">All</button>
+    <button class="inventory-tab" data-tab="weapon">Weapons</button>
+    <button class="inventory-tab" data-tab="armor">Armor</button>
+    <button class="inventory-tab" data-tab="consumable">Items</button>
+  </div>
+  <div class="inventory-body">
+    <div id="inventory-grid"></div>
+    <div id="item-detail"><div style="color:#555;padding:20px;font-size:0.9em">Select an item to see details</div></div>
+  </div>
+</div>
+
+<!-- QUEST PANEL -->
+<div id="quest-panel" class="panel">
+  <div class="panel-header"><span>📜 Quest Log</span><button class="panel-close">✕</button></div>
+  <div id="quest-list" style="padding:12px;overflow-y:auto;flex:1;color:#888">No active quests.</div>
+</div>
+
+<!-- MAP PANEL -->
+<div id="map-panel" class="panel">
+  <div class="panel-header"><span>🗺 World Map</span><button class="panel-close">✕</button></div>
+  <div style="padding:20px;color:#888;text-align:center">
+    <div id="world-map-container" style="width:100%;height:300px;background:#050510;border:1px solid #4a9eff33"></div>
+    <p style="margin-top:12px;font-size:0.85em">Explore the world to unlock new regions.</p>
+  </div>
+</div>
+
+<!-- PAUSE MENU -->
+<div id="pause-menu" class="overlay-menu hidden">
+  <div class="overlay-menu-box">
+    <div class="overlay-menu-title">— PAUSED —</div>
+    <button id="pause-resume" class="menu-btn">▶ Resume</button>
+    <button id="pause-save" class="menu-btn">💾 Save Game</button>
+    <button id="pause-load" class="menu-btn">📂 Load Game</button>
+    <button id="pause-settings" class="menu-btn">⚙ Settings</button>
+    <button id="pause-menu-main" class="menu-btn menu-btn-danger">⟵ Main Menu</button>
+  </div>
+</div>
+
+<!-- SAVE / LOAD PANEL -->
+<div id="save-load-panel" class="panel">
+  <div class="panel-header"><span id="save-load-title">Save Game</span><button class="panel-close">✕</button></div>
+  <div id="save-slots" style="padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel" class="panel">
+  <div class="panel-header"><span>⚙ Settings</span><button class="panel-close">✕</button></div>
+  <div class="settings-body">
+    <div class="setting-row"><label>Master Volume</label><input type="range" id="volume-master" min="0" max="100" value="80"></div>
+    <div class="setting-row"><label>Music Volume</label><input type="range" id="volume-music" min="0" max="100" value="60"></div>
+    <div class="setting-row"><label>SFX Volume</label><input type="range" id="volume-sfx" min="0" max="100" value="90"></div>
+    <div class="setting-row">
+      <label>Graphics</label>
+      <select id="graphics-quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high" selected>High</option></select>
+    </div>
+    <div class="setting-hint">
+      Move: WASD / Arrow Keys &nbsp;|&nbsp; Attack: Space or Left Click<br>
+      Skills: Q W E &nbsp;|&nbsp; Interact: F &nbsp;|&nbsp; Dodge: Shift<br>
+      Inventory: I &nbsp;|&nbsp; Quests: J &nbsp;|&nbsp; Map: M &nbsp;|&nbsp; Pause: ESC
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div id="level-up-screen">
+  <div class="level-up-inner">
+    <div class="level-up-label">✦ LEVEL UP ✦</div>
+    <div class="level-up-num">Lv. <span id="level-up-number">2</span></div>
+    <div class="level-up-sub">All stats have increased</div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="game-over">
+  <div class="game-over-inner">
+    <div class="game-over-title">YOU DIED</div>
+    <div class="game-over-sub">The story is not yet finished.</div>
+    <button id="game-over-retry" class="menu-btn menu-btn-primary">↩ Try Again</button>
+  </div>
+</div>
+
+<!-- CUTSCENE -->
+<div id="cutscene-overlay" style="display:none">
+  <div class="cutscene-text"></div>
+</div>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobile-controls" style="display:none">
+  <div id="virtual-joystick-area">
+    <div class="joystick-base"><div id="joystick-thumb"></div></div>
+  </div>
+  <div id="mobile-buttons">
+    <button id="btn-attack" class="mobile-btn mobile-btn-attack">ATK</button>
+    <button id="btn-skill1" class="mobile-btn">Q</button>
+    <button id="btn-skill2" class="mobile-btn">W</button>
+    <button id="btn-skill3" class="mobile-btn">E</button>
+    <button id="btn-dodge" class="mobile-btn">DODGE</button>
+    <button id="btn-interact" class="mobile-btn">F</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION CONTAINER -->
+<div id="notification-container"></div>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS — order is critical                                  -->
+<!-- ============================================================ -->
+<script src="config/game-config.js"></script>
+<script src="data/characters/characters.js"></script>
+<script src="data/enemies/enemies.js"></script>
+<script src="data/bosses/bosses.js"></script>
+<script src="data/skills/skills.js"></script>
+<script src="data/items/items.js"></script>
+<script src="data/quests/quests.js"></script>
+<script src="data/scenarios/scenarios.js"></script>
+<script src="data/dialogues/dialogues.js"></script>
+<script src="data/maps/maps.js"></script>
+<script src="data/tables/tables.js"></script>
+<script src="data/data-shim.js"></script>
+<script src="scripts/engine/event-system.js"></script>
+<script src="scripts/engine/resource-manager.js"></script>
+<script src="scripts/engine/save-system.js"></script>
+<script src="scripts/engine/audio-system.js"></script>
+<script src="scripts/engine/input-system.js"></script>
+<script src="scripts/engine/camera-system.js"></script>
+<script src="scripts/engine/physics-system.js"></script>
+<script src="scripts/engine/particle-system.js"></script>
+<script src="scripts/engine/animation-system.js"></script>
+<script src="scripts/gameplay/stats-system.js"></script>
+<script src="scripts/gameplay/leveling-system.js"></script>
+<script src="scripts/gameplay/inventory-system.js"></script>
+<script src="scripts/gameplay/skill-system.js"></script>
+<script src="scripts/gameplay/quest-system.js"></script>
+<script src="scripts/gameplay/dialogue-system.js"></script>
+<script src="scripts/gameplay/companion-system.js"></script>
+<script src="scripts/gameplay/constellation-system.js"></script>
+<script src="scripts/combat/combat-system.js"></script>
+<script src="scripts/combat/damage-system.js"></script>
+<script src="scripts/combat/status-effects.js"></script>
+<script src="scripts/ai/pathfinding.js"></script>
+<script src="scripts/ai/enemy-ai.js"></script>
+<script src="scripts/ai/boss-ai.js"></script>
+<script src="scripts/ai/npc-ai.js"></script>
+<script src="scripts/world/world-system.js"></script>
+<script src="scripts/world/minimap.js"></script>
+<script src="scripts/world/chunk-loader.js"></script>
+<script src="scripts/world/spawn-system.js"></script>
+<script src="scripts/world/map-renderer.js"></script>
+<script src="scripts/story/story-system.js"></script>
+<script src="scripts/story/cutscene-system.js"></script>
+<script src="scripts/scenario/scenario-system.js"></script>
+<script src="scripts/scenario/progression-system.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
